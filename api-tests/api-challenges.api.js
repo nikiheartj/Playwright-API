@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-let token; //токен для аутентификации
+let token; //токен сессии
 let xAuthToken; //токен для авторизации
 
 test.describe('API Challenges', () => {
