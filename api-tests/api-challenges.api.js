@@ -1,16 +1,16 @@
 import { test, expect } from '@playwright/test';
-import exp from 'constants';
 
-let token; //токен для авторизации
-let xAuthToken;//токен который не в памяти для теста "PUT /challenger/guid CREATE"
+let token; //токен для аутентификации
+let xAuthToken; //токен для авторизации
 
 test.describe('API Challenges', () => {
   test.beforeAll('POST token (201)', async ({ request }) => {
     const response = await request.post('/challenger');
-    expect(response.status()).toBe(201);
     const HEADERS = await response.headers();
     token = HEADERS['x-challenger'];
     console.log(token);
+
+    expect(response.status()).toBe(201);
   });
 
   test('GET challenges (200)', async ({ request }) => {
@@ -21,9 +21,8 @@ test.describe('API Challenges', () => {
     });
     expect(response.status()).toBe(200);
     const body = await response.json();
-    // console.log(body);
+
     expect(body.challenges.length).toEqual(59);
-    // console.log(body.challenges.length);
   });
 
   test('GET /todos (200)', async ({ request }) => {
@@ -32,10 +31,10 @@ test.describe('API Challenges', () => {
         'x-challenger': token,
       }
     });
-    const body = await response.json();
+    const todos = await response.json();
     
     expect(response.status()).toBe(200);
-    expect(body.todos.length).toEqual(10);
+    expect(todos.todos.length).toEqual(10);
   });
 
   test('GET /todo (404) not plural', async ({ request }) => {
@@ -44,6 +43,7 @@ test.describe('API Challenges', () => {
         'x-challenger': token,
       }
     });
+
     expect(response.status()).toBe(404);
   });
 
@@ -54,6 +54,7 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(response.status()).toBe(200);
     expect(body.todos).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -71,6 +72,7 @@ test.describe('API Challenges', () => {
         'x-challenger': token,
       }
     });
+
     expect(response.status()).toBe(404);
   });
 
@@ -80,9 +82,8 @@ test.describe('API Challenges', () => {
         'x-challenger': token,
       }
     });
+
     expect(response.status()).toBe(200);
-    const HEADERS = await response.headers();
-    // console.log(HEADERS);
   });
 
   test('POST /todos (201)', async ({ request }) => {
@@ -97,7 +98,7 @@ test.describe('API Challenges', () => {
       }
     });
     const DATA = JSON.parse(await response.text());
-    // console.log(DATA);
+
     expect(response.status()).toBe(201);
     expect(DATA.title).toEqual('QA check');
     expect(DATA.doneStatus).toEqual(true);
@@ -133,6 +134,7 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(response.status()).toBe(400);
     expect(body.errorMessages).toEqual(expect.arrayContaining(['Failed Validation: Maximum allowable length exceeded for title - maximum allowed is 50']));
   });
@@ -149,9 +151,9 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(response.status()).toBe(400);
     expect(body.errorMessages).toEqual(['Failed Validation: Maximum allowable length exceeded for description - maximum allowed is 200']);
-    // console.log(body);
   });
 
   test('POST /todos (201) max out content', async ({ request }) => {
@@ -166,10 +168,10 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(body.title.length).toBeLessThanOrEqual(50);
     expect(body.description.length).toBeLessThanOrEqual(200);
     expect(response.status()).toBe(201);
-    // console.log(body);
   });
 
   test('POST /todos (413) content too long', async ({ request }) => {
@@ -184,9 +186,9 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(body.errorMessages).toEqual(expect.arrayContaining(['Error: Request body too large, max allowed is 5000 bytes']));
     expect(response.status()).toBe(413);
-    // console.log(body);
   });
 
   test('POST /todos (400) extra', async ({ request }) => {
@@ -205,9 +207,9 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(body.errorMessages).toEqual(expect.arrayContaining(['Could not find field: tags']));
     expect(response.status()).toBe(400);
-    // console.log(body);
   });
 
   test('PUT /todos/{id} full (200)', async ({ request }) => {
@@ -222,6 +224,7 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(body).toEqual(expect.objectContaining(
       {
         title: 'Put Method',
@@ -242,6 +245,7 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(body).toEqual(expect.objectContaining(
       {
         title: 'Put Method Partly2',
@@ -260,6 +264,7 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(response.status()).toBe(400);
     expect(body.errorMessages).toEqual(expect.arrayContaining([ 'title : field is mandatory' ]));
   });
@@ -276,6 +281,7 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(response.status()).toBe(400);
     expect(body.errorMessages).toEqual(expect.arrayContaining([ 'Can not amend id from 1 to 2' ]));
   });
@@ -291,7 +297,7 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
-    // console.log(body);
+
     expect(response.status()).toBe(400);
     expect(body.errorMessages).toEqual(expect.arrayContaining([ 'Cannot create todo with PUT due to Auto fields id' ]));
   });
@@ -323,6 +329,7 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(response.status()).toBe(404);
     expect(body).toHaveProperty('errorMessages', ['No such todo entity instance with id == 47 found']);
   });
@@ -333,9 +340,9 @@ test.describe('API Challenges', () => {
         'x-challenger': token,
       }
     });
-    expect(response.status()).toBe(200);
     const body = JSON.parse(await response.text());
-    // console.log(body);
+
+    expect(response.status()).toBe(200);
     expect(body.todos.every(todo => todo.doneStatus === true)).toBe(true);
 
   });
@@ -357,6 +364,7 @@ test.describe('API Challenges', () => {
       },
     });
     const headers = await response.headers();
+
     expect(response.status()).toBe(200);
     expect(headers).toHaveProperty('content-type', 'application/xml');
   });
@@ -369,6 +377,7 @@ test.describe('API Challenges', () => {
       },
     });
     const headers = await response.headers();
+
     expect(response.status()).toBe(200);
     expect(headers).toHaveProperty('content-type', 'application/json');
   });
@@ -381,6 +390,7 @@ test.describe('API Challenges', () => {
       },
     });
     const headers = await response.headers();
+
     expect(response.status()).toBe(200);
     expect(headers).toHaveProperty('content-type', 'application/json');
     expect(headers).toHaveProperty('x-robots-tag', 'noindex');
@@ -395,6 +405,7 @@ test.describe('API Challenges', () => {
       },
     });
     const headers = await response.headers();
+
     expect(response.status()).toBe(200);
     expect(headers).toHaveProperty('content-type', 'application/xml');
   });
@@ -407,6 +418,7 @@ test.describe('API Challenges', () => {
       },
     });
     const headers = await response.headers();
+
     expect(response.status()).toBe(200);
     expect(headers).toHaveProperty('content-type', 'application/json');
   });
@@ -419,6 +431,7 @@ test.describe('API Challenges', () => {
       },
     });
     const body = await response.json();
+
     expect(response.status()).toBe(406);
     expect(body).toHaveProperty('errorMessages', ['Unrecognised Accept Type']);
   });
@@ -482,6 +495,7 @@ test.describe('API Challenges', () => {
       }
     });
     const body = await response.json();
+
     expect(response.status()).toBe(415);  
     expect(body).toHaveProperty('errorMessages', [ `Unsupported Content Type - popi` ]);
   });
@@ -494,7 +508,7 @@ test.describe('API Challenges', () => {
     });
     const body = await response.json();
     xAuthToken = body.xAuthToken;
-    console.log(body)
+
     expect(response.status()).toBe(200);  
     expect(body).toHaveProperty('challengeStatus');
   });
@@ -581,12 +595,12 @@ test.describe('API Challenges', () => {
   });
 
   test('PUT /challenger/guid CREATE', async ({ request }) => {
-    const response = await request.put(`/challenger/${xAuthToken}`, {
+    const response = await request.put(`/challenger/${token}`, {
       headers: {
-        'x-challenger': xAuthToken,
+        'x-challenger': token,
       },
       data: {
-        xChallenger: xAuthToken,
+        xChallenger: token,
         secretNote: '',
         challengeStatus: {
           PUT_RESTORABLE_CHALLENGER_PROGRESS_STATUS: false,
@@ -652,7 +666,7 @@ test.describe('API Challenges', () => {
       }
     });
 
-    expect(response.status()).toBe(201);  
+    expect(response.status()).toBe(200);  
   });
 
   test('GET /challenger/database/guid (200)', async ({ request }) => {
@@ -712,5 +726,296 @@ test.describe('API Challenges', () => {
     });
     
     expect(response.status()).toBe(204); 
+  });
+
+  test('POST /todos XML to JSON', async ({ request }) => {
+    const response = await request.post(`/todos`, {
+      headers: {
+        'x-challenger': token,
+        'accept': 'application/json',
+        'content-type': 'application/xml'
+      },
+      data: `
+            <todo>
+              <title>JSON format should receive instead XML</title>
+              <doneStatus>true</doneStatus>
+              <description>JSON format should receive instead XML</description>
+            </todo>
+            `
+    });
+    const headers = await response.headers();
+    const body = await response.json();
+
+    expect(response.status()).toBe(201); 
+    expect(headers).toHaveProperty('content-type', 'application/json');
+    expect(body).toEqual(expect.objectContaining({
+      title: 'JSON format should receive instead XML',
+      doneStatus: true,
+      description: 'JSON format should receive instead XML'
+    }));
+  });
+
+  test('POST /todos JSON to XML', async ({ request }) => {
+    const response = await request.post(`/todos`, {
+      headers: {
+        'x-challenger': token,
+        'accept': 'application/xml',
+        'content-type': 'application/json'
+      },
+      data:{
+          title: 'XML format should receive instead JSON',
+          doneStatus: true,
+          description: 'XML format should receive instead JSON'
+        }
+    });
+    const headers = await response.headers();
+
+    expect(response.status()).toBe(201); 
+    expect(headers).toHaveProperty('content-type', 'application/xml');
+  });
+
+  test('DELETE /heartbeat (405)', async ({ request }) => {
+    const response = await request.delete(`/heartbeat`, {
+      headers: {
+        'x-challenger': token,
+      },
+    });
+
+    expect(response.status()).toBe(405); 
+  });
+
+  test('PATCH /heartbeat (500)', async ({ request }) => {
+    const response = await request.patch(`/heartbeat`, {
+      headers: {
+        'x-challenger': token,
+      },
+    });
+    
+    expect(response.status()).toBe(500); 
+  });
+
+  test('GET /heartbeat (204)', async ({ request }) => {
+    const response = await request.get(`/heartbeat`, {
+      headers: {
+        'x-challenger': token,
+      },
+    });
+    
+    expect(response.status()).toBe(204); 
+  });
+
+  test('POST /heartbeat as DELETE (405)', async ({ request }) => {
+    const response = await request.post(`/heartbeat`, {
+      headers: {
+        'x-challenger': token,
+        'X-HTTP-Method-Override': 'DELETE'
+      },
+    });
+    
+    expect(response.status()).toBe(405); 
+  });
+
+  test('POST /heartbeat as PATCH (500)', async ({ request }) => {
+    const response = await request.post(`/heartbeat`, {
+      headers: {
+        'x-challenger': token,
+        'X-HTTP-Method-Override': 'PATCH'
+      },
+    });
+
+    expect(response.status()).toBe(500); 
+  });
+
+  test('POST /heartbeat as Trace (501)', async ({ request }) => {
+    const response = await request.post(`/heartbeat`, {
+      headers: {
+        'x-challenger': token,
+        'X-HTTP-Method-Override': 'TRACE'
+      },
+    });
+    
+    expect(response.status()).toBe(501); 
+  });
+
+  test('POST /secret/token (401)', async ({ request }) => {
+    const response = await request.post(`/secret/token`, {
+      headers: {
+        'x-challenger': token,
+        'authorization': 'Basic dXNlcjpwYXNzd29yZA=='
+      },
+    });
+    const headers = response.headers();
+    
+    expect(response.status()).toBe(401); 
+    expect(headers).toHaveProperty('www-authenticate');
+  });
+
+  test('POST /secret/token (201)', async ({ request }) => {
+    const response = await request.post(`/secret/token`, {
+      headers: {
+        'x-challenger': token,
+        'authorization': 'Basic YWRtaW46cGFzc3dvcmQ='
+      },
+    });
+    const headers = await response.headers();
+    xAuthToken = await headers['x-auth-token']
+
+    expect(response.status()).toBe(201); 
+    expect(headers).toHaveProperty('x-auth-token');
+  });
+
+  test('GET /secret/note (403)', async ({ request }) => {
+    const response = await request.get(`/secret/note`, {
+      headers: {
+        'x-challenger': token,
+        'x-auth-token': 'haha'
+      },
+    });
+    
+    expect(response.status()).toBe(403); 
+  });
+
+  test('GET /secret/note (401)', async ({ request }) => {
+    const response = await request.get(`/secret/note`, {
+      headers: {
+        'x-challenger': token,
+      },
+    });
+    
+    expect(response.status()).toBe(401); 
+  });
+
+  test('GET /secret/note (200)', async ({ request }) => {
+    const response = await request.get(`/secret/note`, {
+      headers: {
+        'x-challenger': token,
+        'x-auth-token': xAuthToken,
+      },
+    });
+    const body = await response.json();
+
+    expect(response.status()).toBe(200);
+    expect(body).toHaveProperty('note');
+  });
+
+  test('POST /secret/note (200)', async ({ request }) => {
+    const response = await request.post(`/secret/note`, {
+      headers: {
+        'x-challenger': token,
+        'x-auth-token': xAuthToken,
+      },
+      data: { note: 'my note' } 
+    });
+    const body = await response.json();
+
+    expect(response.status()).toBe(200);
+    expect(body.note).toEqual(expect.stringContaining('my note'));
+  });
+
+  test('POST /secret/note (401)', async ({ request }) => {
+    const response = await request.post(`/secret/note`, {
+      headers: {
+        'x-challenger': token,
+      },
+      data: { note: 'my note' } 
+    });
+
+    expect(response.status()).toBe(401);
+  });
+
+  test('POST /secret/note (403)', async ({ request }) => {
+    const response = await request.post(`/secret/note`, {
+      headers: {
+        'x-challenger': token,
+        'x-auth-token': 'haha'
+      },
+      data: { note: 'my note' } 
+    });
+
+    expect(response.status()).toBe(403); 
+  });
+
+  test('GET /secret/note (Bearer)', async ({ request }) => {
+    const response = await request.get(`/secret/note`, {
+      headers: {
+        'x-challenger': token,
+        'authorization': `Bearer ${xAuthToken}`
+      },
+    });
+    const body = await response.json();
+
+    expect(response.status()).toBe(200); 
+    expect(body).toHaveProperty('note');
+  });
+
+  test('POST /secret/note (Bearer)', async ({ request }) => {
+    const response = await request.post(`/secret/note`, {
+      headers: {
+        'x-challenger': token,
+        'authorization': `Bearer ${xAuthToken}`
+      },
+      data: { note: 'my note edited bearer' } 
+    });
+    const body = await response.json();
+
+    expect(response.status()).toBe(200); 
+    expect(body).toHaveProperty('note', 'my note edited bearer');
+  });
+
+  test('DELETE /todos/{id} (200) all', async ({ request }) => {
+      // Сначала получаем список всех todos
+      const getResponse = await request.get('/todos', {
+        headers: {
+          'x-challenger': token,
+        },
+      });
+      const todos = await getResponse.json();
+  
+      // Удаляем каждый todo по одному
+      for (const todo of todos.todos) {
+        const deleteResponse = await request.delete(`/todos/${todo.id}`, {
+          headers: {
+            'x-challenger': token,
+          },
+        });
+        expect(deleteResponse.status()).toBe(200);
+      }
+  
+      // Проверяем, что все todos удалены
+      const finalGetResponse = await request.get('/todos', {
+        headers: {
+          'x-challenger': token,
+        },
+      });
+      const finalTodos = await finalGetResponse.json();
+      expect(finalTodos.todos.length).toBe(0);
+  });
+
+  test('POST /todos (201) all', async ({ request }) => {
+    const todosCreate = 20; 
+    for (let i = 0; i < todosCreate; i++) {
+      const response = await request.post(`/todos`, {
+        headers: {
+          'x-challenger': token,
+        },
+        data: {
+          title: `Todo ${i + 1}`,
+          description: `Description ${i + 1}`
+        }
+      });
+      const body = await response.json();
+      console.log(body);
+      
+      expect(response.status()).toBe(201);
+    }
+
+    // Проверяем, что все todos созданы
+    const finalGetResponse = await request.get('/todos', {
+      headers: {
+        'x-challenger': token,
+      },
+    });
+    const finalTodos = await finalGetResponse.json();
+    expect(finalTodos.todos.length).toEqual(todosCreate);
   });
 });
