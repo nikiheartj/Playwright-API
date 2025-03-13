@@ -21,9 +21,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      - name: # Install npm
+      - name: Install npm
         run: npm i
-      - name: # Install PW with dependencies
+      - name: Install PW with dependencies
         run: npx playwright install --with-deps
-      - name: # Lanch auto-tests
+      - name: Launch auto-tests
         run: npm run goAllureTests
