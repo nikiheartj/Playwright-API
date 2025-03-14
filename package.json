@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npx playwright test",
     "ui": "npx playwright test --ui",
-    "goAllureTests": "npx allure run -- npm test",
+    "runTests": "npx allure run -- npm test",
     "openAllure": "npx allure open allure-report/awesome"
   },
   "keywords": [],

@@ -16,7 +16,7 @@ test.describe('API Challenges', () => {
     }
   );
 
-  test('@GET challenges (200)', async ({ request }) => {
+  test('Get the list of challenges. @GET', async ({ request }) => {
     const response = await request.get('/challenges', {
       headers: {
         'x-challenger': token
@@ -28,7 +28,7 @@ test.describe('API Challenges', () => {
     expect(body.challenges.length).toEqual(59);
   });
 
-  test('@GET /todos (200)', async ({ request }) => {
+  test('Get the list of todos. @GET', async ({ request }) => {
     const response = await request.get('/todos', {
       headers: {
         'x-challenger': token
@@ -40,7 +40,7 @@ test.describe('API Challenges', () => {
     expect(todos.todos.length).toEqual(10);
   });
 
-  test('@GET /todo (404) not plural', async ({ request }) => {
+  test('/todo (404) not plural. @GET', async ({ request }) => {
     const response = await request.get('/todo', {
       headers: {
         'x-challenger': token
