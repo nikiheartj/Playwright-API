@@ -26,8 +26,8 @@ jobs:
       - name: Install PW with dependencies
         run: npx playwright install --with-deps
       - name: Launch auto-tests
-        run: npm t
-      # Save PW-report
+        run: npx playwright test
+      # Save playwright-results
       - uses: actions/upload-artifact@v4
         if: always()
         continue-on-error: true
@@ -35,7 +35,7 @@ jobs:
           name: test-results
           path: test-results
           retention-days: 21
-      # Save Allure-results
+      # Save allure-results
       - uses: actions/upload-artifact@v4
         if: always()
         continue-on-error: true
