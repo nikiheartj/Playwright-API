@@ -29,8 +29,8 @@ jobs:
         run: npx playwright install --with-deps
         # Launch auto-tests
       - name: Launch auto-tests
-        run: npm run goAllureTests
-        # Save playwright-results
+        run: npm run runTests
+        # Save playwright-report
       - uses: actions/upload-artifact@v4
         if: always()
         continue-on-error: true
