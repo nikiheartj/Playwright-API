@@ -7,7 +7,7 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
-  # Manual launch
+  # Manual hook for launch
   workflow_dispatch:
 
 jobs:
@@ -17,25 +17,28 @@ jobs:
     steps:
       # Clone the code from repository into runner (virtual machine)
       - uses: actions/checkout@v4
-      # Install node js
+        # Install node js
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
+        # Install npm
       - name: Install npm
         run: npm i
+        # Install PW with dependencies
       - name: Install PW with dependencies
         run: npx playwright install --with-deps
+        # Launch auto-tests
       - name: Launch auto-tests
-        run: npx playwright test
-      # Save playwright-results
+        run: npm run runTests
+        # Save playwright-report
       - uses: actions/upload-artifact@v4
         if: always()
         continue-on-error: true
         with:
-          name: test-results
-          path: test-results
+          name: playwright-report
+          path: playwright-report
           retention-days: 21
-      # Save allure-results
+        # Save allure-results
       - uses: actions/upload-artifact@v4
         if: always()
         continue-on-error: true
@@ -43,14 +46,14 @@ jobs:
           name: allure-results
           path: allure-results
           retention-days: 21
-      # Get results of the previous launch
+        # Get results of the previous launch
       - uses: actions/checkout@v4
         if: always()
         continue-on-error: true
         with:
           ref: gh-pages
           path: gh-pages
-      # Create allure-report from allure-results
+        # Create allure-report from allure-results
       - uses: simple-elf/allure-report-action@master
         if: always()
         id: allure-report
@@ -60,7 +63,7 @@ jobs:
           allure_report: allure-report
           allure_history: allure-history
           keep_reports: 21
-      # Deploy report to GitHub Pages
+        # Deploy report to GitHub Pages
       - name: deploy report
         if: always()
         uses: peaceiris/actions-gh-pages@v4
