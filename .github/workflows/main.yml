@@ -26,7 +26,7 @@ jobs:
       - name: Install PW with dependencies
         run: npx playwright install --with-deps
       - name: Launch auto-tests
-        run: npx t
+        run: npm t
       # Save PW-report
       - uses: actions/upload-artifact@v4
         if: always()
